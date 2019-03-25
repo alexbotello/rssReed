@@ -5,11 +5,16 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"sort"
 	"sync"
 	"time"
 
 	"github.com/mmcdole/gofeed"
 )
+
+var items []*gofeed.Item
+var wg sync.WaitGroup
+var pipe = make(chan *gofeed.Item)
 
 var rssfeeds = []string{
 	"https://news.ycombinator.com/rss",
@@ -18,8 +23,25 @@ var rssfeeds = []string{
 	"https://www.kut.org/rss.xml",
 }
 
-func retrieveFeed(w *sync.WaitGroup, c chan<- *gofeed.Item, feed string) {
-	defer w.Done()
+func runProcess() {
+	wg.Add(len(rssfeeds))
+	for _, feed := range rssfeeds {
+		go retrieveFeed(feed)
+	}
+	go readFromPipe()
+	wg.Wait()
+	sort.Sort(byTime(items))
+
+	// Currently only sorts and prints to stdout
+	// TODO ADD ITEMS INTO SQLLITE DATABASE
+	// EVERY 5 minutes go retrieveFeed again and only add new entries into DB
+	for _, item := range items {
+		fmt.Println(item.Title)
+	}
+}
+
+func retrieveFeed(feed string) {
+	defer wg.Done()
 	resp, err := http.Get(feed)
 	if err != nil {
 		log.Printf("Request failed to find %s feed\n", feed)
@@ -29,15 +51,15 @@ func retrieveFeed(w *sync.WaitGroup, c chan<- *gofeed.Item, feed string) {
 	fp := gofeed.NewParser()
 	data, _ := fp.ParseString(string(body))
 	for _, d := range data.Items {
-		c <- d
+		pipe <- d
 	}
 	fmt.Print(feed + " ")
 	fmt.Println("Finished at ", time.Now())
 }
 
-func readFromPipe(items *[]*gofeed.Item, c <-chan *gofeed.Item) {
-	for i := range c {
-		*items = append(*items, i)
+func readFromPipe() {
+	for i := range pipe {
+		items = append(items, i)
 	}
 }
 
