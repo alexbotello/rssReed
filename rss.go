@@ -9,6 +9,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/jinzhu/gorm"
 	"github.com/mmcdole/gofeed"
 )
 
@@ -23,6 +24,17 @@ var rssfeeds = []string{
 	"https://www.kut.org/rss.xml",
 }
 
+// RssItem represents the database model for an Rss Item
+type RssItem struct {
+	gorm.Model
+	ID    uint
+	Title string
+	Link  string
+	Desc  string
+	Date  *time.Time
+	Image string
+}
+
 func runProcess() {
 	wg.Add(len(rssfeeds))
 	for _, feed := range rssfeeds {
@@ -30,6 +42,7 @@ func runProcess() {
 	}
 	go readFromPipe()
 	wg.Wait()
+	close(pipe)
 	sort.Sort(byTime(items))
 
 	// Currently only sorts and prints to stdout
