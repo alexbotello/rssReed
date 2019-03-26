@@ -18,6 +18,22 @@
   version = "v1.0.0"
 
 [[projects]]
+  digest = "1:d4e6e8584d0a94ce567d237e19192dae44d57d2767ac7e1d7fbf5626d176381a"
+  name = "github.com/jinzhu/gorm"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "472c70caa40267cb89fd8facb07fe6454b578626"
+  version = "v1.9.2"
+
+[[projects]]
+  branch = "master"
+  digest = "1:fd97437fbb6b7dce04132cf06775bd258cce305c44add58eb55ca86c6c325160"
+  name = "github.com/jinzhu/inflection"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "04140366298a54a039076d798123ffa108fff46c"
+
+[[projects]]
   digest = "1:b0142f883994390cee3fc0efbee8644c91796eb17d6af1bf8268a0961e6c0f3b"
   name = "github.com/mmcdole/gofeed"
   packages = [
@@ -80,6 +96,9 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  input-imports = ["github.com/mmcdole/gofeed"]
+  input-imports = [
+    "github.com/jinzhu/gorm",
+    "github.com/mmcdole/gofeed",
+  ]
   solver-name = "gps-cdcl"
   solver-version = 1
