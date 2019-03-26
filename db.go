@@ -10,7 +10,7 @@ import (
 	"github.com/mmcdole/gofeed"
 )
 
-func verifyDatabase() {
+func verifyDatabase(s *stream) {
 	if _, err := os.Stat("./rss.db"); os.IsNotExist(err) {
 		f, err := os.Create("rss.db")
 		if err != nil {
@@ -24,10 +24,11 @@ func verifyDatabase() {
 	}
 	defer db.Close()
 	db.AutoMigrate(&RssItem{})
+	gatherFeeds(s)
 	return
 }
 
-func addItemToDB(item *gofeed.Item) {
+func addItemToDB(item *gofeed.Item, s *stream) {
 	var rI RssItem
 	var img string
 
@@ -37,11 +38,13 @@ func addItemToDB(item *gofeed.Item) {
 	}
 	defer db.Close()
 
+	// Some RSS feeds may not provide an image
 	if item.Image == nil {
 		img = "None"
 	} else {
 		img = item.Image.URL
 	}
+	// Only add RssItems that do not exist in the database
 	if result := db.Where(&RssItem{Title: item.Title}).First(&rI); result.Error != nil {
 		rI = RssItem{
 			Title: item.Title,
@@ -52,11 +55,16 @@ func addItemToDB(item *gofeed.Item) {
 		}
 		db.NewRecord(rI)
 		db.Create(&rI)
+
+		// If the app is on inital load there's no need to send items through the websocket
+		if !s.initialLoad {
+			s.client.send <- &rI
+		}
 		fmt.Println("Adding item into DB")
 	}
 }
 
-func getAllRecords() {
+func getAllRecords() []RssItem {
 	db, err := gorm.Open("sqlite3", "rss.db")
 	if err != nil {
 		panic("failed to connect to database")
@@ -65,8 +73,5 @@ func getAllRecords() {
 	var items []RssItem
 	db.Find(&items)
 	sort.Sort(byTime(items))
-	for _, item := range items {
-		// fmt.Println(item.Date.Format("Mon Jan _2 15:04:05 2006"))
-		fmt.Println(item.Title)
-	}
+	return items
 }
