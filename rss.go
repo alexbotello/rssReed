@@ -33,21 +33,22 @@ type RssItem struct {
 	Image string
 }
 
-func runProcess() {
+func gatherFeeds(s *stream) {
 	wg.Add(len(rssfeeds))
 	for _, feed := range rssfeeds {
-		go retrieveFeed(feed)
+		go retrieve(feed)
 	}
 	go readFromPipe()
 	wg.Wait()
 
 	// close(pipe)
 	for _, item := range items {
-		addItemToDB(item)
+		addItemToDB(item, s)
 	}
+	s.initialLoad = false
 }
 
-func retrieveFeed(feed string) {
+func retrieve(feed string) {
 	defer wg.Done()
 	resp, err := http.Get(feed)
 	if err != nil {
