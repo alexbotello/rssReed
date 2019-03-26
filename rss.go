@@ -32,7 +32,7 @@ type RssItem struct {
 	Date  *time.Time
 }
 
-func runProcess(db *gorm.DB) {
+func runProcess() {
 	wg.Add(len(rssfeeds))
 	for _, feed := range rssfeeds {
 		go retrieveFeed(feed)
@@ -42,7 +42,7 @@ func runProcess(db *gorm.DB) {
 
 	// close(pipe)
 	for _, item := range items {
-		addItemToDB(db, item)
+		addItemToDB(item)
 	}
 }
 

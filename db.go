@@ -18,11 +18,22 @@ func verifyDatabase() {
 		}
 		defer f.Close()
 	}
+	db, err := gorm.Open("sqlite3", "rss.db")
+	if err != nil {
+		panic("failed to connect to database")
+	}
+	defer db.Close()
+	db.AutoMigrate(&RssItem{})
 	return
 }
 
-func addItemToDB(db *gorm.DB, item *gofeed.Item) {
+func addItemToDB(item *gofeed.Item) {
 	var rI RssItem
+	db, err := gorm.Open("sqlite3", "rss.db")
+	if err != nil {
+		panic("failed to connect to database")
+	}
+	defer db.Close()
 	if result := db.Where(&RssItem{Title: item.Title}).First(&rI); result.Error != nil {
 		rI = RssItem{
 			Title: item.Title,
@@ -36,7 +47,12 @@ func addItemToDB(db *gorm.DB, item *gofeed.Item) {
 	}
 }
 
-func getAllRecords(db *gorm.DB) {
+func getAllRecords() {
+	db, err := gorm.Open("sqlite3", "rss.db")
+	if err != nil {
+		panic("failed to connect to database")
+	}
+	defer db.Close()
 	var items []RssItem
 	db.Find(&items)
 	sort.Sort(byTime(items))
