@@ -29,17 +29,26 @@ func verifyDatabase() {
 
 func addItemToDB(item *gofeed.Item) {
 	var rI RssItem
+	var img string
+
 	db, err := gorm.Open("sqlite3", "rss.db")
 	if err != nil {
 		panic("failed to connect to database")
 	}
 	defer db.Close()
+
+	if item.Image == nil {
+		img = "None"
+	} else {
+		img = item.Image.URL
+	}
 	if result := db.Where(&RssItem{Title: item.Title}).First(&rI); result.Error != nil {
 		rI = RssItem{
 			Title: item.Title,
 			Link:  item.Link,
 			Desc:  item.Description,
 			Date:  item.PublishedParsed,
+			Image: img,
 		}
 		db.NewRecord(rI)
 		db.Create(&rI)

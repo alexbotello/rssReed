@@ -30,6 +30,7 @@ type RssItem struct {
 	Link  string
 	Desc  string
 	Date  *time.Time
+	Image string
 }
 
 func runProcess() {
