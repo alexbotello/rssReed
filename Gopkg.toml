@@ -30,9 +30,5 @@
   unused-packages = true
 
 [[constraint]]
-  name = "github.com/mattn/go-sqlite3"
-  version = "1.10.0"
-
-[[constraint]]
   name = "github.com/jinzhu/gorm"
   version = "1.9.2"
