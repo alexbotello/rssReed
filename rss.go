@@ -5,7 +5,6 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
-	"sort"
 	"sync"
 	"time"
 
@@ -27,29 +26,23 @@ var rssfeeds = []string{
 // RssItem represents the database model for an Rss Item
 type RssItem struct {
 	gorm.Model
-	ID    uint
 	Title string
 	Link  string
 	Desc  string
 	Date  *time.Time
-	Image string
 }
 
-func runProcess() {
+func runProcess(db *gorm.DB) {
 	wg.Add(len(rssfeeds))
 	for _, feed := range rssfeeds {
 		go retrieveFeed(feed)
 	}
 	go readFromPipe()
 	wg.Wait()
-	close(pipe)
-	sort.Sort(byTime(items))
 
-	// Currently only sorts and prints to stdout
-	// TODO ADD ITEMS INTO SQLLITE DATABASE
-	// EVERY 5 minutes go retrieveFeed again and only add new entries into DB
+	// close(pipe)
 	for _, item := range items {
-		fmt.Println(item.Title)
+		addItemToDB(db, item)
 	}
 }
 
@@ -77,7 +70,7 @@ func readFromPipe() {
 }
 
 // byTime type is used for sorting feed items from newest to oldest
-type byTime []*gofeed.Item
+type byTime []RssItem
 
 func (t byTime) Len() int {
 	return len(t)
@@ -88,5 +81,5 @@ func (t byTime) Swap(i, j int) {
 }
 
 func (t byTime) Less(i, j int) bool {
-	return t[i].PublishedParsed.After(*t[j].PublishedParsed)
+	return t[i].Date.After(*t[j].Date)
 }
