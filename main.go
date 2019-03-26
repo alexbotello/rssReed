@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"net/http"
+	"os"
 	"path/filepath"
 	"sync"
 	"text/template"
@@ -31,6 +32,14 @@ func main() {
 
 	http.Handle("/", &templateHandler{filename: "rss.html"})
 	http.Handle("/stream", stream)
+
+	http.HandleFunc("/exit", func(w http.ResponseWriter, r *http.Request) {
+		err := os.Remove("rss.db")
+		if err != nil {
+			log.Fatal("Failed to remove database upon close")
+		}
+		os.Exit(1)
+	})
 
 	if err := http.ListenAndServe(":8080", nil); err != nil {
 		log.Fatal("ListenAndServe:", err)
