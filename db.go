@@ -39,10 +39,10 @@ func addItemToDB(item *gofeed.Item, s *stream) {
 	defer db.Close()
 
 	// Some RSS feeds may not provide an image
-	if item.Image == nil {
+	if item.Extensions == nil {
 		img = "None"
 	} else {
-		img = item.Image.URL
+		img = item.Extensions["media"]["thumbnail"][0].Attrs["url"]
 	}
 	// Only add RssItems that do not exist in the database
 	if result := db.Where(&RssItem{Title: item.Title}).First(&rI); result.Error != nil {
