@@ -32,6 +32,9 @@ func (s *stream) streamToSocket() {
 }
 
 func (s *stream) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	upgrader.CheckOrigin = func(r *http.Request) bool {
+		return true
+	}
 	socket, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		log.Fatal("ServeHTTP Socket: ", err)
