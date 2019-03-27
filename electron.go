@@ -9,8 +9,8 @@ type electron struct {
 
 func (e *electron) write() {
 	defer e.conn.Close()
-	for msg := range e.send {
-		err := e.conn.WriteJSON(msg.Title)
+	for item := range e.send {
+		err := e.conn.WriteJSON(item)
 		if err != nil {
 			return
 		}
