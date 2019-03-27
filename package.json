@@ -1,0 +1,6 @@
+{
+  "scripts": {
+    "start": "cd electron && yarn start "
+  },
+  "license": "ISC"
+}

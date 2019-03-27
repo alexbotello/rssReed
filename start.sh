@@ -1,0 +1,1 @@
+./server/server & yarn start && fg
