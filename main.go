@@ -5,27 +5,9 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"path/filepath"
-	"sync"
-	"text/template"
 
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
 )
-
-type templateHandler struct {
-	once     sync.Once
-	filename string
-	templ    *template.Template
-}
-
-func (t *templateHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	items := getAllRecords()
-
-	t.once.Do(func() {
-		t.templ = template.Must(template.ParseFiles(filepath.Join("templates", t.filename)))
-	})
-	t.templ.Execute(w, items)
-}
 
 type jsonHandler struct {
 	items []RssItem
