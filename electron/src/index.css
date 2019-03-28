@@ -9,7 +9,7 @@ body {
 
 .panel {
     min-width: 300px;
-    border: 1px solid white;
+    min-height: 500px;
     margin: 5px;
 }
 
@@ -31,7 +31,6 @@ body {
 
 .rssItem:hover {
     background-color: #323439;
-    border: none;
 }
 
 .rssItem h3 {
