@@ -37,7 +37,6 @@ func addFeedToDB(f *Feed) {
 	if query := db.Where(f).First(&none); query.Error != nil {
 		db.NewRecord(&f)
 		db.Create(f)
-		log.Println("Adding Feed URL into DB")
 		return
 	}
 	log.Println("Feed could not be added to the database")
@@ -73,7 +72,7 @@ func addItemToDB(result *Result, s *Stream) {
 		}
 		db.NewRecord(rI)
 		db.Create(&rI)
-		// s.client.send <- &rI
+		s.client.send <- &rI
 		log.Println("Adding Item Into DB")
 	}
 }
