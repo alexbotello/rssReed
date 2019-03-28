@@ -10,7 +10,8 @@ import (
 )
 
 type jsonHandler struct {
-	items []RssItem
+	items []Item
+	s     *Stream
 }
 
 func (j *jsonHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -33,7 +34,7 @@ func main() {
 	stream := newStream()
 	verifyDatabase()
 
-	http.Handle("/", &jsonHandler{})
+	http.Handle("/", &jsonHandler{s: stream})
 	http.Handle("/stream", stream)
 	http.Handle("/exit", &exitHandler{})
 

@@ -15,22 +15,23 @@ const (
 
 var upgrader = &websocket.Upgrader{ReadBufferSize: socketBuffersize, WriteBufferSize: socketBuffersize}
 
-type stream struct {
+// Stream represents a websocket connection between client and server
+type Stream struct {
 	client *electron
 }
 
-func newStream() *stream {
-	return &stream{}
+func newStream() *Stream {
+	return &Stream{}
 }
 
-func (s *stream) streamToSocket() {
+func (s *Stream) streamToSocket() {
 	for {
 		gatherFeeds(s)
 		time.Sleep(30 * time.Second)
 	}
 }
 
-func (s *stream) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (s *Stream) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	upgrader.CheckOrigin = func(r *http.Request) bool {
 		return true
 	}
@@ -41,7 +42,7 @@ func (s *stream) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 	electron := &electron{
 		conn: socket,
-		send: make(chan *RssItem, messageBufferSize),
+		send: make(chan *Item, messageBufferSize),
 	}
 	s.client = electron
 

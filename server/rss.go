@@ -13,9 +13,10 @@ import (
 	"github.com/mmcdole/gofeed"
 )
 
-var items []*gofeed.Item
+var results []*Result
 var wg sync.WaitGroup
-var pipe = make(chan *gofeed.Item)
+var pipe = make(chan *Result)
+var feedType string
 
 var rssfeeds = []string{
 	"https://news.ycombinator.com/rss",
@@ -24,17 +25,31 @@ var rssfeeds = []string{
 	"https://www.kut.org/rss.xml",
 }
 
-// RssItem represents the database model for an Rss Item
-type RssItem struct {
+// Feed represents RSS feed url link
+type Feed struct {
 	gorm.Model
-	Title string
-	Link  string
-	Desc  string
-	Date  *time.Time
-	Image string
+	url string
 }
 
-func gatherFeeds(s *stream) {
+// Result represents a parsed RSS Feed result
+type Result struct {
+	source string
+	item   *gofeed.Item
+}
+
+// Item represents the database model of a RSS Item
+type Item struct {
+	gorm.Model
+	Source string
+	Title  string
+	Link   string
+	Desc   string
+	Date   *time.Time
+	Image  string
+}
+
+func gatherFeeds(s *Stream) {
+	// feeds := getAllFeeds()
 	wg.Add(len(rssfeeds))
 	for _, feed := range rssfeeds {
 		go retrieve(feed)
@@ -42,9 +57,9 @@ func gatherFeeds(s *stream) {
 	go readFromPipe()
 	wg.Wait()
 
-	sort.Sort(byTime(items))
-	for _, item := range items {
-		addItemToDB(item, s)
+	sort.Sort(byTime(results))
+	for _, result := range results {
+		addItemToDB(result, s)
 	}
 }
 
@@ -62,25 +77,26 @@ func retrieve(feed string) {
 		log.Printf("Parsing response body failed: %s", err)
 		return
 	}
-	for idx, data := range data.Items {
+	source := data.Title
+	for idx, item := range data.Items {
 		// Exit loop after 10 items
 		if idx == 10 {
 			break
 		}
-		pipe <- data
+		pipe <- &Result{source: source, item: item}
 	}
 	fmt.Print(feed + " ")
 	fmt.Println("Finished at ", time.Now())
 }
 
 func readFromPipe() {
-	for i := range pipe {
-		items = append(items, i)
+	for r := range pipe {
+		results = append(results, r)
 	}
 }
 
 // byTime type is used for sorting feed items from newest to oldest
-type byTime []*gofeed.Item
+type byTime []*Result
 
 func (t byTime) Len() int {
 	return len(t)
@@ -91,5 +107,5 @@ func (t byTime) Swap(i, j int) {
 }
 
 func (t byTime) Less(i, j int) bool {
-	return t[i].PublishedParsed.Before(*t[j].PublishedParsed)
+	return t[i].item.PublishedParsed.Before(*t[j].item.PublishedParsed)
 }

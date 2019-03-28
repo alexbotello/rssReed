@@ -4,7 +4,7 @@ import "github.com/gorilla/websocket"
 
 type electron struct {
 	conn *websocket.Conn
-	send chan *RssItem
+	send chan *Item
 }
 
 func (e *electron) write() {

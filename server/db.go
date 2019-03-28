@@ -5,7 +5,6 @@ import (
 	"os"
 
 	"github.com/jinzhu/gorm"
-	"github.com/mmcdole/gofeed"
 )
 
 func verifyDatabase() {
@@ -22,13 +21,34 @@ func verifyDatabase() {
 		panic("failed to connect to database")
 	}
 	defer db.Close()
-	db.AutoMigrate(&RssItem{})
+	db.AutoMigrate(&Item{}, &Feed{})
 	return
 }
 
-func addItemToDB(item *gofeed.Item, s *stream) {
-	var rI RssItem
+func addFeedToDB(feed string) {
+	log.Printf("Adding %s into db", feed)
+	var f Feed
+	db, err := gorm.Open("sqlite3", "rss.db")
+	if err != nil {
+		panic("failed to connect to database")
+	}
+	defer db.Close()
+
+	if query := db.Where(&Feed{url: feed}).First(&f); query.Error != nil {
+		f = Feed{url: feed}
+		db.NewRecord(f)
+		db.Create(&f)
+		log.Println("Adding Feed URL into DB")
+		return
+	}
+	log.Println("Feed could not be added to the database")
+}
+
+func addItemToDB(result *Result, s *Stream) {
+	var rI Item
 	var img string
+	source := result.source
+	item := result.item
 
 	db, err := gorm.Open("sqlite3", "rss.db")
 	if err != nil {
@@ -43,13 +63,14 @@ func addItemToDB(item *gofeed.Item, s *stream) {
 		img = item.Extensions["media"]["thumbnail"][0].Attrs["url"]
 	}
 	// Only add RssItems that do not exist in the database
-	if result := db.Where(&RssItem{Title: item.Title}).First(&rI); result.Error != nil {
-		rI = RssItem{
-			Title: item.Title,
-			Link:  item.Link,
-			Desc:  item.Description,
-			Date:  item.PublishedParsed,
-			Image: img,
+	if query := db.Where(&Item{Title: item.Title}).First(&rI); query.Error != nil {
+		rI = Item{
+			Source: source,
+			Title:  item.Title,
+			Link:   item.Link,
+			Desc:   item.Description,
+			Date:   item.PublishedParsed,
+			Image:  img,
 		}
 		db.NewRecord(rI)
 		db.Create(&rI)
@@ -58,13 +79,24 @@ func addItemToDB(item *gofeed.Item, s *stream) {
 	}
 }
 
-func getAllRecords() []RssItem {
+func getAllFeeds() []Feed {
 	db, err := gorm.Open("sqlite3", "rss.db")
 	if err != nil {
 		panic("failed to connect to database")
 	}
 	defer db.Close()
-	var items []RssItem
+	var feeds []Feed
+	db.Find(&feeds)
+	return feeds
+}
+
+func getAllRecords() []Item {
+	db, err := gorm.Open("sqlite3", "rss.db")
+	if err != nil {
+		panic("failed to connect to database")
+	}
+	defer db.Close()
+	var items []Item
 	db.Find(&items)
 	return items
 }
