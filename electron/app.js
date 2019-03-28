@@ -18,6 +18,7 @@ app.once('ready', () => {
     height: 1000,
     // Don't show the window until it ready, this prevents any white flickering
     show: false,
+    icon: path.join(__dirname, "ico.png"),
     webPreferences: {
       // Disable node integration in remote page
       nodeIntegration: false
