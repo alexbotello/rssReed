@@ -92,14 +92,15 @@ func readFromPipe() {
 func makeRequest(url string) (*gofeed.Feed, error) {
 	resp, err := http.Get(url)
 	if err != nil {
-		log.Printf("Request failed to find %s feed\n", url)
+		log.Println("Request failed to find feed")
+		return nil, errors.New("makeRequest failed to complete")
 	}
 	defer resp.Body.Close()
 	body, _ := ioutil.ReadAll(resp.Body)
 	fp := gofeed.NewParser()
 	data, err := fp.ParseString(string(body))
 	if err != nil {
-		log.Printf("Parsing response body failed: %s", err)
+		log.Printf("Parsing response body failed:%s", err)
 		return nil, errors.New("makeRequest failed to complete")
 	}
 	return data, nil
