@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"os"
 	"sort"
@@ -11,6 +10,7 @@ import (
 )
 
 func verifyDatabase(s *stream) {
+	// Check if database file exists; if not create it
 	if _, err := os.Stat("./rss.db"); os.IsNotExist(err) {
 		f, err := os.Create("rss.db")
 		if err != nil {
@@ -23,6 +23,7 @@ func verifyDatabase(s *stream) {
 		panic("failed to connect to database")
 	}
 	defer db.Close()
+	// If new database generate tables and populate with rss items
 	db.AutoMigrate(&RssItem{})
 	gatherFeeds(s)
 	return
@@ -56,11 +57,11 @@ func addItemToDB(item *gofeed.Item, s *stream) {
 		db.NewRecord(rI)
 		db.Create(&rI)
 
-		// If the app is on inital load there's no need to send items through the websocket
+		// If the app is on inital load skip the send to websocket
 		if !s.initialLoad {
 			s.client.send <- &rI
 		}
-		fmt.Println("Adding item into DB")
+		log.Println("Adding Item Into DB")
 	}
 }
 
@@ -74,4 +75,19 @@ func getAllRecords() []RssItem {
 	db.Find(&items)
 	sort.Sort(byTime(items))
 	return items
+}
+
+// byTime type is used for sorting feed items from newest to oldest
+type byTime []RssItem
+
+func (t byTime) Len() int {
+	return len(t)
+}
+
+func (t byTime) Swap(i, j int) {
+	t[i], t[j] = t[j], t[i]
+}
+
+func (t byTime) Less(i, j int) bool {
+	return t[i].Date.After(*t[j].Date)
 }

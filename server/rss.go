@@ -41,7 +41,6 @@ func gatherFeeds(s *stream) {
 	go readFromPipe()
 	wg.Wait()
 
-	// close(pipe)
 	for _, item := range items {
 		addItemToDB(item, s)
 	}
@@ -73,19 +72,4 @@ func readFromPipe() {
 	for i := range pipe {
 		items = append(items, i)
 	}
-}
-
-// byTime type is used for sorting feed items from newest to oldest
-type byTime []RssItem
-
-func (t byTime) Len() int {
-	return len(t)
-}
-
-func (t byTime) Swap(i, j int) {
-	t[i], t[j] = t[j], t[i]
-}
-
-func (t byTime) Less(i, j int) bool {
-	return t[i].Date.After(*t[j].Date)
 }
