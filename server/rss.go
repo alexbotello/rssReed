@@ -16,7 +16,6 @@ import (
 var results []*Result
 var wg sync.WaitGroup
 var pipe = make(chan *Result)
-var feedType string
 
 var rssfeeds = []string{
 	"https://news.ycombinator.com/rss",
