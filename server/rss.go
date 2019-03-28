@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"sort"
 	"sync"
 	"time"
 
@@ -41,6 +42,7 @@ func gatherFeeds(s *stream) {
 	go readFromPipe()
 	wg.Wait()
 
+	sort.Sort(byTime(items))
 	for _, item := range items {
 		addItemToDB(item, s)
 	}
@@ -75,4 +77,19 @@ func readFromPipe() {
 	for i := range pipe {
 		items = append(items, i)
 	}
+}
+
+// byTime type is used for sorting feed items from newest to oldest
+type byTime []*gofeed.Item
+
+func (t byTime) Len() int {
+	return len(t)
+}
+
+func (t byTime) Swap(i, j int) {
+	t[i], t[j] = t[j], t[i]
+}
+
+func (t byTime) Less(i, j int) bool {
+	return t[i].PublishedParsed.Before(*t[j].PublishedParsed)
 }

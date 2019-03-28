@@ -3,7 +3,6 @@ package main
 import (
 	"log"
 	"os"
-	"sort"
 
 	"github.com/jinzhu/gorm"
 	"github.com/mmcdole/gofeed"
@@ -67,21 +66,5 @@ func getAllRecords() []RssItem {
 	defer db.Close()
 	var items []RssItem
 	db.Find(&items)
-	sort.Sort(byTime(items))
 	return items
-}
-
-// byTime type is used for sorting feed items from newest to oldest
-type byTime []RssItem
-
-func (t byTime) Len() int {
-	return len(t)
-}
-
-func (t byTime) Swap(i, j int) {
-	t[i], t[j] = t[j], t[i]
-}
-
-func (t byTime) Less(i, j int) bool {
-	return t[i].Date.After(*t[j].Date)
 }
