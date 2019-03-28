@@ -9,6 +9,7 @@ body {
 
 .panel {
     min-width: 300px;
+    width: 300px;
     min-height: 500px;
     margin: 5px;
 }
@@ -49,4 +50,8 @@ body {
 
 .newItem {
     border: 1px solid #ccffdd;
+}
+
+.Feed {
+    list-style: none
 }
