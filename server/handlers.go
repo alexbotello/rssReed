@@ -2,6 +2,8 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -13,10 +15,16 @@ type jsonHandler struct {
 }
 
 func (j *jsonHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	gatherFeeds(j.s)
-	j.items = getAllFeeds()
+	type data struct {
+		Feed []Feed
+		Item []Item
+	}
+	feeds := getAllFeeds()
+	items := getAllRecords()
+	resp := data{Feed: feeds, Item: items}
+
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(j.items)
+	json.NewEncoder(w).Encode(resp)
 }
 
 type exitHandler struct{}
@@ -32,5 +40,27 @@ func (e *exitHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 type saveHandler struct{}
 
 func (s *saveHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-
+	var feed Feed
+	body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		http.Error(w, "Error reading request body", 500)
+		return
+	}
+	err = json.Unmarshal(body, &feed)
+	if err != nil {
+		http.Error(w, "JSON unmarshalling failed", 500)
+		return
+	}
+	data, err := makeRequest(feed.URL)
+	if err != nil {
+		http.Error(w, "makeRequest failed to retrieve extra data", 500)
+		return
+	}
+	feed.Name = data.Title
+	err = addFeedToDB(&feed)
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+	fmt.Fprintf(w, "New feed %s successfully saved", feed.Name)
 }
