@@ -25,7 +25,7 @@ $(function () {
         alert("Error: Your browser does not support web sockets.")
         console.log("Websocket can't connect")
     } else {
-        sleep(12000) // Sleep for 15 seconds until initial load is complete
+        // sleep(5000) // Sleep for 15 seconds until initial load is complete
         socket = new WebSocket("ws://localhost:5000/stream");
         socket.onclose = function () {
             alert("Connection has been closed.");
