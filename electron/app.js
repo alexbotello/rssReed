@@ -1,4 +1,5 @@
-const {app, BrowserWindow} = require('electron') // http://electron.atom.io/docs/api
+const {app, BrowserWindow, webContents} = require('electron') // http://electron.atom.io/docs/api
+const shell = require('electron').shell;
 const axios = require("axios")
 const url = require('url');
 const path = require('path')
@@ -30,6 +31,17 @@ app.once('ready', () => {
 
   window.once('ready-to-show', () => {
     window.show()
+  })
+
+  function isSafeishURL(url) {
+    return url.startsWith('http:') || url.startsWith('https:');
+  }
+
+  window.webContents.on("will-navigate", function(event, url) {
+    event.preventDefault()
+    if (isSafeishURL(url)) {
+      shell.openExternal(url);
+    }
   })
 })
 
