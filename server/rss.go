@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -27,7 +28,8 @@ var rssfeeds = []string{
 // Feed represents RSS feed url link
 type Feed struct {
 	gorm.Model
-	url string
+	URL  string
+	Name string
 }
 
 // Result represents a parsed RSS Feed result
@@ -64,17 +66,9 @@ func gatherFeeds(s *Stream) {
 
 func retrieve(feed string) {
 	defer wg.Done()
-	resp, err := http.Get(feed)
+	data, err := makeRequest(feed)
 	if err != nil {
-		log.Printf("Request failed to find %s feed\n", feed)
-	}
-	defer resp.Body.Close()
-	body, _ := ioutil.ReadAll(resp.Body)
-	fp := gofeed.NewParser()
-	data, err := fp.ParseString(string(body))
-	if err != nil {
-		log.Printf("Parsing response body failed: %s", err)
-		return
+		log.Println(err)
 	}
 	source := data.Title
 	for idx, item := range data.Items {
@@ -84,6 +78,7 @@ func retrieve(feed string) {
 		}
 		pipe <- &Result{source: source, item: item}
 	}
+	addFeedToDB(&Feed{URL: feed, Name: source})
 	fmt.Print(feed + " ")
 	fmt.Println("Finished at ", time.Now())
 }
@@ -92,6 +87,22 @@ func readFromPipe() {
 	for r := range pipe {
 		results = append(results, r)
 	}
+}
+
+func makeRequest(url string) (*gofeed.Feed, error) {
+	resp, err := http.Get(url)
+	if err != nil {
+		log.Printf("Request failed to find %s feed\n", url)
+	}
+	defer resp.Body.Close()
+	body, _ := ioutil.ReadAll(resp.Body)
+	fp := gofeed.NewParser()
+	data, err := fp.ParseString(string(body))
+	if err != nil {
+		log.Printf("Parsing response body failed: %s", err)
+		return nil, errors.New("makeRequest failed to complete")
+	}
+	return data, nil
 }
 
 // byTime type is used for sorting feed items from newest to oldest

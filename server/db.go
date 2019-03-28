@@ -25,19 +25,18 @@ func verifyDatabase() {
 	return
 }
 
-func addFeedToDB(feed string) {
-	log.Printf("Adding %s into db", feed)
-	var f Feed
+func addFeedToDB(f *Feed) {
+	log.Printf("Adding %p into db", f)
+	var none Feed
 	db, err := gorm.Open("sqlite3", "rss.db")
 	if err != nil {
 		panic("failed to connect to database")
 	}
 	defer db.Close()
 
-	if query := db.Where(&Feed{URL: feed}).First(&f); query.Error != nil {
-		f = Feed{URL: feed}
-		db.NewRecord(f)
-		db.Create(&f)
+	if query := db.Where(f).First(&none); query.Error != nil {
+		db.NewRecord(&f)
+		db.Create(f)
 		log.Println("Adding Feed URL into DB")
 		return
 	}
@@ -74,7 +73,7 @@ func addItemToDB(result *Result, s *Stream) {
 		}
 		db.NewRecord(rI)
 		db.Create(&rI)
-		s.client.send <- &rI
+		// s.client.send <- &rI
 		log.Println("Adding Item Into DB")
 	}
 }
