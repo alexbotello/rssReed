@@ -6,8 +6,15 @@
 </head>
 
 <body>
-    <div class="container"></div>
+    <div id="container"></div>
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
     <script src="src/load.js"></script>
     <script src="src/socket.js"></script>
+    <script>
+        $(".rssItem").hover(
+            function () {
+              $(this).removeClass("newItem");
+            }
+        );
+    </script>
 </body>

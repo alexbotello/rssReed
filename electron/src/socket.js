@@ -6,10 +6,21 @@ function sleep(ms)
     while(curDate-date < ms);
 }
 
+function formatDate(date) {
+    date = new Date(date)
+    var hours = date.getHours();
+    var minutes = date.getMinutes();
+    var ampm = hours >= 12 ? 'pm' : 'am';
+    hours = hours % 12;
+    hours = hours ? hours : 12; // the hour '0' should be '12'
+    minutes = minutes < 10 ? '0'+minutes : minutes;
+    var strTime = hours + ':' + minutes + ' ' + ampm;
+    return date.getMonth()+1 + "/" + date.getDate() + "/" + date.getFullYear() + "  " + strTime;
+  }
+
 $(function () {
     var socket = null;
-    var items = $(".container");
-    var div
+    var items = $("#container");
     if (!window["WebSocket"]) {
         alert("Error: Your browser does not support web sockets.")
         console.log("Websocket can't connect")
@@ -21,14 +32,13 @@ $(function () {
         }
         socket.onmessage = function (e) {
             let data = JSON.parse(e.data)
-            div = $("<div>").addClass("rssItem")
+            var rssItem = $("<div>").addClass("rssItem newItem")
+            let link = $("<a>").attr("href", data.Link)
             let title = $("<h3>").text(data.Title)
-            let img = $("<img>").attr("src", data.Image).addClass("rssImage")
-            // let link = data[i].Link $("<>")
-            let desc = $("<p>").text(data.Desc)
-            let date = $("<span>").text(data.Date)
-            div.append(img, title, desc, date)
-            div.prependTo(items)
+            link.append(title)
+            let date = $("<span>").text(formatDate(data.Date))
+            rssItem.append(link, date)
+            rssItem.prependTo(items)
         }
     }
 });

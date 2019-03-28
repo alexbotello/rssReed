@@ -1,13 +1,39 @@
+body {
+    background-color: #393b41;
+}
 .container {
     display: flex;
     flex-direction: column;
+    align-items: center;
 }
 .rssItem {
-    margin: 25px;
-    border: 1px solid black;
+    display: flex;
+    margin: 5px;
+    align-items: center;
+    justify-content: space-between;
+    width: 1000px;
+    background-color: #404249
 }
 
-.rssImage {
-    height: 200px;
-    width: 200px;
+.rssItem:hover {
+    background-color: #323439;
+    border: none;
+}
+
+.rssItem h3 {
+    padding-left: 15px;
+    color: #cccdce;
+}
+.rssItem span {
+    padding-right: 15px;
+    color: #cccdce;
+}
+
+.rssItem a {
+    text-decoration: none;
+    color: #cccdce;
+}
+
+.newItem {
+    border: 1px solid #ccffdd;
 }
