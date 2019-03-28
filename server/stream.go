@@ -16,18 +16,17 @@ const (
 var upgrader = &websocket.Upgrader{ReadBufferSize: socketBuffersize, WriteBufferSize: socketBuffersize}
 
 type stream struct {
-	initialLoad bool
-	client      *electron
+	client *electron
 }
 
 func newStream() *stream {
-	return &stream{initialLoad: true}
+	return &stream{}
 }
 
 func (s *stream) streamToSocket() {
 	for {
-		time.Sleep(30 * time.Second)
 		gatherFeeds(s)
+		time.Sleep(30 * time.Second)
 	}
 }
 

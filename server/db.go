@@ -9,7 +9,7 @@ import (
 	"github.com/mmcdole/gofeed"
 )
 
-func verifyDatabase(s *stream) {
+func verifyDatabase() {
 	// Check if database file exists; if not create it
 	if _, err := os.Stat("./rss.db"); os.IsNotExist(err) {
 		f, err := os.Create("rss.db")
@@ -23,9 +23,7 @@ func verifyDatabase(s *stream) {
 		panic("failed to connect to database")
 	}
 	defer db.Close()
-	// If new database generate tables and populate with rss items
 	db.AutoMigrate(&RssItem{})
-	gatherFeeds(s)
 	return
 }
 
@@ -56,11 +54,7 @@ func addItemToDB(item *gofeed.Item, s *stream) {
 		}
 		db.NewRecord(rI)
 		db.Create(&rI)
-
-		// If the app is on inital load skip the send to websocket
-		if !s.initialLoad {
-			s.client.send <- &rI
-		}
+		s.client.send <- &rI
 		log.Println("Adding Item Into DB")
 	}
 }

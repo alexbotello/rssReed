@@ -44,7 +44,6 @@ func gatherFeeds(s *stream) {
 	for _, item := range items {
 		addItemToDB(item, s)
 	}
-	s.initialLoad = false
 }
 
 func retrieve(feed string) {
@@ -61,8 +60,12 @@ func retrieve(feed string) {
 		log.Printf("Parsing response body failed: %s", err)
 		return
 	}
-	for _, d := range data.Items {
-		pipe <- d
+	for idx, data := range data.Items {
+		// Exit loop after 10 items
+		if idx == 10 {
+			break
+		}
+		pipe <- data
 	}
 	fmt.Print(feed + " ")
 	fmt.Println("Finished at ", time.Now())

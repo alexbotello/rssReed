@@ -31,7 +31,7 @@ func (e *exitHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 	stream := newStream()
-	verifyDatabase(stream)
+	verifyDatabase()
 
 	http.Handle("/", &jsonHandler{})
 	http.Handle("/stream", stream)
