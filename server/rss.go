@@ -57,7 +57,11 @@ func retrieve(feed string) {
 	defer resp.Body.Close()
 	body, _ := ioutil.ReadAll(resp.Body)
 	fp := gofeed.NewParser()
-	data, _ := fp.ParseString(string(body))
+	data, err := fp.ParseString(string(body))
+	if err != nil {
+		log.Printf("Parsing response body failed: %s", err)
+		return
+	}
 	for _, d := range data.Items {
 		pipe <- d
 	}
