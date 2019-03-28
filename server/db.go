@@ -34,8 +34,8 @@ func addFeedToDB(feed string) {
 	}
 	defer db.Close()
 
-	if query := db.Where(&Feed{url: feed}).First(&f); query.Error != nil {
-		f = Feed{url: feed}
+	if query := db.Where(&Feed{URL: feed}).First(&f); query.Error != nil {
+		f = Feed{URL: feed}
 		db.NewRecord(f)
 		db.Create(&f)
 		log.Println("Adding Feed URL into DB")

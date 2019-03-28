@@ -10,12 +10,15 @@ import (
 )
 
 type jsonHandler struct {
-	items []Item
+	items []Feed
 	s     *Stream
 }
 
 func (j *jsonHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	j.items = getAllRecords()
+	for _, feed := range rssfeeds {
+		addFeedToDB(feed)
+	}
+	j.items = getAllFeeds()
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(j.items)
 }
