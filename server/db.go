@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"log"
 	"os"
 
@@ -25,8 +26,7 @@ func verifyDatabase() {
 	return
 }
 
-func addFeedToDB(f *Feed) {
-	log.Printf("Adding %p into db", f)
+func addFeedToDB(f *Feed) error {
 	var none Feed
 	db, err := gorm.Open("sqlite3", "rss.db")
 	if err != nil {
@@ -37,9 +37,9 @@ func addFeedToDB(f *Feed) {
 	if query := db.Where(f).First(&none); query.Error != nil {
 		db.NewRecord(&f)
 		db.Create(f)
-		return
+		return nil
 	}
-	log.Println("Feed could not be added to the database")
+	return errors.New("Error saving feed to DB")
 }
 
 func addItemToDB(result *Result, s *Stream) {
