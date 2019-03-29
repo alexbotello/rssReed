@@ -2,5 +2,6 @@
   "scripts": {
     "start": "cd electron && yarn start "
   },
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {}
 }
