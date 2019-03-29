@@ -8,9 +8,12 @@ body {
 }
 
 .panel {
-    min-width: 300px;
-    width: 300px;
-    min-height: 500px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    /* align-items: center; */
+    width: 250px;
+    height: 950px;
     margin: 5px;
 }
 
@@ -52,6 +55,59 @@ body {
     border: 1px solid #ccffdd;
 }
 
+#feeds {
+    display: flex;
+    flex-direction: column;
+    list-style: none;
+    margin-right: 50px;
+    justify-content: flex-start;
+    align-items: flex-start;
+    color: #cccdce;
+    font-weight: 700;
+}
+
 .Feed {
-    list-style: none
+    margin: 5px;
+}
+
+#plus {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100px;
+    width: 100px;
+    -moz-border-radius: 50%;
+    -webkit-border-radius: 50%;
+    border-radius: 50%;
+    border: 2px solid #ccffdd;
+    font-size: 64px;
+    text-align: center;
+    color: #cccdce;
+    cursor: pointer;
+    margin-left: 10px;
+}
+
+#plus:hover {
+    background-color: #323439;
+    border-color: #cccdce;
+}
+
+#label {
+    position: absolute;
+    width: 145px;
+    height: 25px;
+    background-color: #404249;
+    text-align: center;
+    color: #cccdce;
+    padding-top: 5px;
+    bottom: 60px;
+    left: 100px;
+    border-radius: 5px;
+}
+
+.invisible {
+    visibility: hidden;
+}
+.visible {
+    visibility: visible ;
 }

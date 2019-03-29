@@ -2,6 +2,7 @@ $(function () {
     let feeds = document.getElementById("feeds")
     var items = $("#container");
 
+    // Helper functions
     function formatDate(date) {
         date = new Date(date)
         var hours = date.getHours();
@@ -16,7 +17,7 @@ $(function () {
 
     function populateItems(data) {
         for (let i = 0; i < data.length; i++) {
-            var rssItem = $("<div>").addClass("rssItem newItem")
+            var rssItem = $("<div>").addClass("rssItem")
             let link = $("<a>").attr("href", data[i].Link)
             let title = $("<h3>").text(data[i].Title)
             link.append(title)
@@ -28,12 +29,28 @@ $(function () {
 
     function populateFeed(data) {
         for (let i = 0; i < data.length; i++) {
-            let li = $("<li>").text(data[i].Name).addClass("Feed")
+            let name = parseFeedName(data[i])
+            let li = $("<li>").text(name.toUpperCase()).addClass("Feed")
             li.appendTo(feeds)
         }
-
     }
 
+    function parseFeedName(obj) {
+        let str
+        if (obj.Name === "") {
+            str = obj.URL
+        } else {
+            str = obj.Name
+        }
+        let name = str.split("-")[0]
+        name = name.replace("www.", "")
+        name = name.replace(".com", "")
+        name = name.split(".org")[0]
+        name = name.replace("https://", "")
+        return name
+    }
+
+    // Populate Feed sidebar and any feed items currenty in the database
     fetch("http://localhost:5000/")
         .then(resp => {
             resp.json()
@@ -58,7 +75,17 @@ $(function () {
     container.addEventListener("mouseenter", (event) => {
         event.target.classList.remove("newItem")
     })
-    container.addEventListener("mouseenter", (event) => {
+    container.addEventListener("mouseleave", (event) => {
         event.target.classList.remove("newItem")
+    })
+
+    let plus = document.getElementById("plus")
+    plus.addEventListener("mouseover", (event) => {
+        let label = document.getElementById("label")
+        label.classList.add("visible")
+    })
+    plus.addEventListener("mouseleave", (event) => {
+        let label = document.getElementById("label")
+        label.classList.remove("visible")
     })
 });
