@@ -23,7 +23,6 @@ function formatDate(date) {
 $(function () {
     const { remote } = require("electron")
     var socket = remote.getCurrentWindow()["socket"]
-    console.log(socket)
     var items = $("#container");
     socket.on("message", (data) => {
         data = JSON.parse(data)

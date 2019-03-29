@@ -13,9 +13,14 @@
             <label id="label" class="invisible">Add New RSS Feed</label>
         </div>
         <div id="container"></div>
+        <div id="popup" class="invisible">
+            <h3>Add New RSS Feed</h3>
+            <div class="input-wrapper">
+                <input id="input" type="text" placeholder="Enter URL Here"></input>
+                <button id="button" type="submit">Submit</button>
+            </div>
+        </div>
     </div>
-    <!-- <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script> -->
-    <!-- <script>require("http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js")</script> -->
     <script>window.$ = window.jQuery = require("jquery")</script>
     <script>require("./src/socket.js")</script>
     <script>require("./src/events.js")</script>

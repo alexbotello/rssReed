@@ -2,6 +2,10 @@ body {
     background-color: #393b41;
 }
 
+h3 {
+    color: #cccdce;
+}
+
 .main {
     width: 100%;
     display: flex;
@@ -39,7 +43,7 @@ body {
 
 .rssItem h3 {
     padding-left: 15px;
-    color: #cccdce;
+
 }
 .rssItem span {
     padding-right: 15px;
@@ -106,6 +110,64 @@ body {
     left: 100px;
     border-radius: 5px;
 }
+
+#popup {
+    position: fixed;
+    top: 40%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border: 1px solid #cccdce;
+    background-color: #323439;
+    width: 700px;
+    height: 400px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
+    z-index: 100;
+}
+
+#popup h3 {
+    font-size: 40px;
+}
+
+.input-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-bottom: 50px;
+}
+
+#button {
+    margin-top: 20px;
+    border-style: none;
+    border-radius: 3px;
+    height: 32px;
+    width: 125px;
+    border: 1px solid #cccdce;
+    background-color: #404249;
+    color: #cccdce;
+    font-size: 14px;
+    outline: none;
+    cursor: pointer;
+}
+
+#button:hover {
+    background-color: #323439;
+    border-color: #cccdce;
+}
+
+#input {
+    background-color: #404249;
+    border-style: none;
+    border-radius: 5px;
+    padding-left: 10px;
+    height: 35px;
+    width: 500px;
+    color: #cccdce;
+    outline: none;
+}
+
 
 .invisible {
     visibility: hidden;
