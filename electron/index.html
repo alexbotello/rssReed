@@ -14,7 +14,9 @@
         </div>
         <div id="container"></div>
     </div>
-    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
-    <script src="src/socket.js"></script>
-    <script src="src/events.js"></script>
+    <!-- <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script> -->
+    <!-- <script>require("http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js")</script> -->
+    <script>window.$ = window.jQuery = require("jquery")</script>
+    <script>require("./src/socket.js")</script>
+    <script>require("./src/events.js")</script>
 </body>

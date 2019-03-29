@@ -1,4 +1,9 @@
-const {app, BrowserWindow, webContents} = require('electron') // http://electron.atom.io/docs/api
+const {
+  app,
+  BrowserWindow,
+  remote
+} = require('electron')
+const WebSocket = require("ws")
 const shell = require('electron').shell;
 const axios = require("axios")
 const url = require('url');
@@ -21,9 +26,14 @@ app.once('ready', () => {
     icon: path.join(__dirname, "ico.png"),
     webPreferences: {
       // Disable node integration in remote page
-      nodeIntegration: false
+      nodeIntegration: true
     }
   })
+
+  window.socket = new WebSocket("ws://localhost:5000/stream")
+  window.socket.setMaxListeners(1)
+
+
   window.loadURL(url.format({
     pathname: path.join(__dirname, 'index.html'),
     protocol: 'file:',
@@ -38,7 +48,7 @@ app.once('ready', () => {
     return url.startsWith('http:') || url.startsWith('https:');
   }
 
-  window.webContents.on("will-navigate", function(event, url) {
+  window.webContents.on("will-navigate", function (event, url) {
     event.preventDefault()
     if (isSafeishURL(url)) {
       shell.openExternal(url);
@@ -47,11 +57,11 @@ app.once('ready', () => {
 })
 
 app.on("window-all-closed", () => {
-    axios.get("http://localhost:5000/exit")
-        .then(() => {
-            app.quit()
-        })
-        .catch(err => {
-            app.quit()
-        })
+  axios.get("http://localhost:5000/exit")
+    .then(() => {
+      app.quit()
+    })
+    .catch(err => {
+      app.quit()
+    })
 })

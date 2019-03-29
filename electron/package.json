@@ -12,6 +12,8 @@
     "electron": "^3.0.2"
   },
   "dependencies": {
-    "axios": "^0.18.0"
+    "axios": "^0.18.0",
+    "jquery": "^3.3.1",
+    "ws": "^6.2.1"
   }
 }
