@@ -50,15 +50,19 @@ type Item struct {
 }
 
 func gatherFeeds(s *Stream) {
-	// feeds := getAllFeeds()
-	wg.Add(len(rssfeeds))
-	for _, feed := range rssfeeds {
-		go retrieve(feed)
+	feeds, err := getAllFeeds()
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	wg.Add(len(feeds))
+	for _, feed := range feeds {
+		go retrieve(feed.URL)
 	}
 	go readFromPipe()
 	wg.Wait()
 
-	sort.Sort(byTime(results))
+	sort.Sort(byResult(results))
 	for _, result := range results {
 		addItemToDB(result, s)
 	}
@@ -109,19 +113,4 @@ func makeRequest(url string) (*gofeed.Feed, error) {
 		return nil, errors.New("makeRequest failed to complete")
 	}
 	return data, nil
-}
-
-// byTime type is used for sorting feed items from newest to oldest
-type byTime []*Result
-
-func (t byTime) Len() int {
-	return len(t)
-}
-
-func (t byTime) Swap(i, j int) {
-	t[i], t[j] = t[j], t[i]
-}
-
-func (t byTime) Less(i, j int) bool {
-	return t[i].item.PublishedParsed.Before(*t[j].item.PublishedParsed)
 }

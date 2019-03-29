@@ -7,19 +7,22 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"sort"
 )
+
+type data struct {
+	Feed []Feed
+	Item []Item
+}
 
 type jsonHandler struct {
 	items []Feed
 }
 
 func (j *jsonHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	type data struct {
-		Feed []Feed
-		Item []Item
-	}
-	feeds := getAllFeeds()
+	feeds, _ := getAllFeeds()
 	items := getAllRecords()
+	sort.Sort(byItem(items))
 	resp := data{Feed: feeds, Item: items}
 
 	w.Header().Set("Content-Type", "application/json")

@@ -8,7 +8,7 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
-func verifyDatabase() {
+func verifyDatabases() {
 	// Check if database file exists; if not create it
 	if _, err := os.Stat("./rss.db"); os.IsNotExist(err) {
 		f, err := os.Create("rss.db")
@@ -17,18 +17,32 @@ func verifyDatabase() {
 		}
 		defer f.Close()
 	}
+	// Check that feeds database exists
+	if _, err := os.Stat("./feeds.db"); os.IsNotExist(err) {
+		f, err := os.Create("feeds.db")
+		if err != nil {
+			log.Fatal("Error creating feeds.db file")
+		}
+		defer f.Close()
+		feedsDB, err := gorm.Open("sqlite3", "feeds.db")
+		if err != nil {
+			panic("failed to connect to database")
+		}
+		defer feedsDB.Close()
+		feedsDB.AutoMigrate(&Feed{})
+	}
 	db, err := gorm.Open("sqlite3", "rss.db")
 	if err != nil {
 		panic("failed to connect to database")
 	}
 	defer db.Close()
-	db.AutoMigrate(&Item{}, &Feed{})
+	db.AutoMigrate(&Item{})
 	return
 }
 
 func addFeedToDB(f *Feed) error {
 	var none Feed
-	db, err := gorm.Open("sqlite3", "rss.db")
+	db, err := gorm.Open("sqlite3", "feeds.db")
 	if err != nil {
 		panic("failed to connect to database")
 	}
@@ -77,15 +91,19 @@ func addItemToDB(result *Result, s *Stream) {
 	}
 }
 
-func getAllFeeds() []Feed {
-	db, err := gorm.Open("sqlite3", "rss.db")
+func getAllFeeds() ([]Feed, error) {
+	db, err := gorm.Open("sqlite3", "feeds.db")
 	if err != nil {
 		panic("failed to connect to database")
 	}
 	defer db.Close()
 	var feeds []Feed
 	db.Find(&feeds)
-	return feeds
+
+	if len(feeds) < 1 {
+		return nil, errors.New("No feeds saved inside database")
+	}
+	return feeds, nil
 }
 
 func getAllRecords() []Item {

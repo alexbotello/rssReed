@@ -116,7 +116,14 @@ $(function () {
             body: JSON.stringify(data)
         })
         .then(resp => {
-            console.log(resp)
+            resp.json()
+              .then(data => console.log(data))
+            //     respFeeds = data.Feed
+            //     respItems = data.Item
+            //     populateItems(respItems)
+            //     populateFeed(respFeeds)
+            //   })
+              .catch(err => console.log(err))
         })
         .catch(err => {
             console.log(err)
