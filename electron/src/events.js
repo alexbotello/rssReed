@@ -67,8 +67,8 @@ $(function () {
         .catch(err => {
             console.log(err)
         })
-    // Remove green border when new item is touched
     let container = document.getElementById("container")
+    // Remove green border when new item is touched
     container.addEventListener("mouseover", (event) => {
         event.target.classList.remove("newItem")
     })
@@ -80,6 +80,7 @@ $(function () {
     })
 
     let plus = document.getElementById("plus")
+    // Display tooltip label when Add button is hovered over
     plus.addEventListener("mouseover", (event) => {
         let label = document.getElementById("label")
         label.classList.add("visible")
