@@ -66,6 +66,11 @@ func gatherFeeds(s *Stream) {
 
 func retrieve(feed string) {
 	defer wg.Done()
+	defer func() {
+		if err := recover(); err != nil {
+			log.Printf("Recover from err: %s", err)
+		}
+	}()
 	data, err := makeRequest(feed)
 	if err != nil {
 		log.Println(err)

@@ -10,8 +10,7 @@ import (
 func main() {
 	stream := newStream()
 	verifyDatabase()
-
-	http.Handle("/", &jsonHandler{s: stream})
+	http.Handle("/", &jsonHandler{})
 	http.Handle("/stream", stream)
 	http.Handle("/exit", &exitHandler{})
 	http.Handle("/save", &saveHandler{})

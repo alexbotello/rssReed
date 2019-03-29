@@ -11,7 +11,6 @@ import (
 
 type jsonHandler struct {
 	items []Feed
-	s     *Stream
 }
 
 func (j *jsonHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {

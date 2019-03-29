@@ -38,7 +38,6 @@ func (s *Stream) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	socket, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		log.Fatal("ServeHTTP Socket: ", err)
-		return
 	}
 	electron := &electron{
 		conn: socket,
