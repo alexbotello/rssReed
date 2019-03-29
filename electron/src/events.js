@@ -89,4 +89,8 @@ $(function () {
         let label = document.getElementById("label")
         label.classList.remove("visible")
     })
+
+    plus.addEventListener("click", (event) => {
+        console.log("Add Click event logic here")
+    })
 });
