@@ -4,6 +4,7 @@ import (
 	"errors"
 	"log"
 	"os"
+	"time"
 
 	"github.com/jinzhu/gorm"
 )
@@ -59,6 +60,7 @@ func addFeedToDB(f *Feed) error {
 func addItemToDB(result *Result, s *Stream) {
 	var rI Item
 	var img string
+	var date *time.Time
 	source := result.source
 	item := result.item
 
@@ -74,6 +76,13 @@ func addItemToDB(result *Result, s *Stream) {
 	} else {
 		img = item.Extensions["media"]["thumbnail"][0].Attrs["url"]
 	}
+
+	if item.PublishedParsed == nil {
+		date = item.UpdatedParsed
+	} else {
+		date = item.PublishedParsed
+	}
+
 	// Only add RssItems that do not exist in the database
 	if query := db.Where(&Item{Title: item.Title}).First(&rI); query.Error != nil {
 		rI = Item{
@@ -81,7 +90,7 @@ func addItemToDB(result *Result, s *Stream) {
 			Title:  item.Title,
 			Link:   item.Link,
 			Desc:   item.Description,
-			Date:   item.PublishedParsed,
+			Date:   date,
 			Image:  img,
 		}
 		db.NewRecord(rI)

@@ -12,7 +12,11 @@ func (t byResult) Swap(i, j int) {
 }
 
 func (t byResult) Less(i, j int) bool {
-	return t[i].item.PublishedParsed.Before(*t[j].item.PublishedParsed)
+	a, b := t[i].item, t[j].item
+	if a.PublishedParsed == nil || b.PublishedParsed == nil {
+		return false
+	}
+	return a.PublishedParsed.Before(*b.PublishedParsed)
 }
 
 // byItem type is used for sorting Item items from newest to oldest

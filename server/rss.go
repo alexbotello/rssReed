@@ -17,12 +17,14 @@ import (
 var results []*Result
 var wg sync.WaitGroup
 var pipe = make(chan *Result)
+var userAgent = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36"
 
 var rssfeeds = []string{
 	"https://news.ycombinator.com/rss",
 	"http://feeds.bbci.co.uk/news/world/rss.xml",
 	"http://www.espn.com/espn/rss/news",
 	"https://www.kut.org/rss.xml",
+	"https://www.reddit.com/r/golang/new/.rss",
 }
 
 // Feed represents RSS feed url link
@@ -66,6 +68,7 @@ func gatherFeeds(s *Stream) {
 	for _, result := range results {
 		addItemToDB(result, s)
 	}
+	results = []*Result{}
 }
 
 func retrieve(feed string) {
@@ -99,18 +102,23 @@ func readFromPipe() {
 }
 
 func makeRequest(url string) (*gofeed.Feed, error) {
-	resp, err := http.Get(url)
+	client := &http.Client{}
+	request, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		log.Println("Request failed to find feed")
 		return nil, errors.New("makeRequest failed to complete")
 	}
-	defer resp.Body.Close()
+
+	request.Header.Set("User-Agent", userAgent)
+	resp, err := client.Do(request)
 	body, _ := ioutil.ReadAll(resp.Body)
+	defer resp.Body.Close()
+
 	fp := gofeed.NewParser()
 	data, err := fp.ParseString(string(body))
 	if err != nil {
-		log.Printf("Parsing response body failed:%s", err)
-		return nil, errors.New("makeRequest failed to complete")
+		er := fmt.Sprintf("Parsing response body failed: %s", err)
+		return nil, errors.New(er)
 	}
 	return data, nil
 }
