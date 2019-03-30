@@ -17,7 +17,7 @@ func (t byResult) Less(i, j int) bool {
 			return
 		}
 	}()
-	a, b := t[i].item, t[j].item
+	a, b := t[i].Item, t[j].Item
 	if a.PublishedParsed == nil || b.PublishedParsed == nil {
 		return false
 	}

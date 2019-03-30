@@ -36,8 +36,8 @@ type Feed struct {
 
 // Result represents a parsed RSS Feed result
 type Result struct {
-	source string
-	item   *gofeed.Item
+	Source string
+	Item   *gofeed.Item
 }
 
 // Item represents the database model of a RSS Item
@@ -88,7 +88,7 @@ func retrieve(feed string) {
 		if idx == 10 {
 			break
 		}
-		pipe <- &Result{source: source, item: item}
+		pipe <- &Result{Source: source, Item: item}
 	}
 	addFeedToDB(&Feed{URL: feed, Name: source})
 	fmt.Print(feed + " ")
