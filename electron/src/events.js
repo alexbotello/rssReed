@@ -10,15 +10,6 @@ $(function () {
     let close = document.getElementById("popup-close")
     let items = $("#container");
 
-    function sleep(ms) {
-        var date = new Date();
-        var curDate = null;
-        do {
-            curDate = new Date();
-        }
-        while (curDate - date < ms);
-    }
-
     function populateItems(data) {
         for (let i = 0; i < data.length; i++) {
             var parseTitle;
@@ -74,7 +65,7 @@ $(function () {
         if (str.includes(":")) {
             // It's a reddit feed
             str = str.split(":")[1].replace(" ", "")
-            str = "r/"+str
+            str = "r/" + str
         }
         console.log(str)
         return str
@@ -87,24 +78,30 @@ $(function () {
         return true
     }
 
+    function requestServerData() {
+        fetch("http://localhost:5000/")
+            .then(resp => {
+                resp.json()
+                    .then(data => {
+                        respFeeds = data.Feed
+                        respItems = data.Item
+                        populateItems(respItems)
+                        populateFeed(respFeeds)
+                    })
+                    .catch(err => {
+                        console.log(err)
+                    })
+            })
+            .catch(err => {
+                console.log(err)
+            })
+    }
+
     // Populate Feed sidebar and any feed items currenty in the database
-    sleep(2000)
-    fetch("http://localhost:5000/")
-        .then(resp => {
-            resp.json()
-                .then(data => {
-                    respFeeds = data.Feed
-                    respItems = data.Item
-                    populateItems(respItems)
-                    populateFeed(respFeeds)
-                })
-                .catch(err => {
-                    console.log(err)
-                })
-        })
-        .catch(err => {
-            console.log(err)
-        })
+    setTimeout(() => {
+        requestServerData()
+    }, 5000)
+
     // Remove green border when new item is touched
     container.addEventListener("mouseover", (event) => {
         event.target.classList.remove("newItem")
@@ -131,7 +128,7 @@ $(function () {
 
     // Remove error outline if refocusing on input
     input.addEventListener("focus", (event) => {
-        input.style.outline="none"
+        input.style.outline = "none"
     })
 
     // Close popup if X button is clicked
@@ -142,29 +139,31 @@ $(function () {
     // Submit new rss feed to server
     button.addEventListener("click", (event) => {
         if (!isValid(input.value)) {
-            input.style.outline="1px solid #8B0000"
+            input.style.outline = "1px solid #8B0000"
             return
         }
         popup.classList.remove("visible")
-        let data = {"Url": input.value}
+        let data = {
+            "Url": input.value
+        }
         input.value = ""
         fetch("http://localhost:5000/save", {
-            method: "post",
-            body: JSON.stringify(data)
-        })
-        .then(resp => {
-            resp.json()
-              .then(data => console.log(data))
-            //     respFeeds = data.Feed
-            //     respItems = data.Item
-            //     populateItems(respItems)
-            //     populateFeed(respFeeds)
-            //   })
-              .catch(err => console.log(err))
-        })
-        .catch(err => {
-            console.log(err)
-        })
+                method: "post",
+                body: JSON.stringify(data)
+            })
+            .then(resp => {
+                resp.json()
+                    .then(data => console.log(data))
+                    //     respFeeds = data.Feed
+                    //     respItems = data.Item
+                    //     populateItems(respItems)
+                    //     populateFeed(respFeeds)
+                    //   })
+                    .catch(err => console.log(err))
+            })
+            .catch(err => {
+                console.log(err)
+            })
     })
 
 });
