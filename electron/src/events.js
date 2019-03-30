@@ -21,12 +21,28 @@ $(function () {
 
     function populateItems(data) {
         for (let i = 0; i < data.length; i++) {
+            var parseTitle;
+            var sourceName;
             var rssItem = $("<div>").addClass("rssItem")
+            var meta = $("<div>").addClass("meta")
             let link = $("<a>").attr("href", data[i].Link)
-            let title = $("<h3>").text(data[i].Title)
+            if (data[i].Title.length > 60) {
+                parseTitle = data[i].Title.slice(0, 60) + "..."
+            } else {
+                parseTitle = data[i].Title
+            }
+
+            if (data[i].Source === null) {
+                sourceName = data[i].Link
+            } else {
+                sourceName = data[i].Source
+            }
+            let title = $("<h3>").text(parseTitle)
             link.append(title)
+            let source = $("<p>").text(parseFeedName(sourceName))
             let date = $("<span>").text(moment(data[i].Date).format("MMMM Do YYYY"))
-            rssItem.append(link, date)
+            meta.append(source, date)
+            rssItem.append(link, meta)
             rssItem.prependTo(items)
         }
     };
@@ -39,19 +55,29 @@ $(function () {
         }
     }
 
-    function parseFeedName(obj) {
+    function parseFeedName(data) {
         let str
-        if (obj.Name === "") {
-            str = obj.URL
+        if (typeof data === "string" || data instanceof String) {
+            str = data
         } else {
-            str = obj.Name
+            if (data.Name === "") {
+                str = data.URL
+            } else {
+                str = data.Name
+            }
         }
-        let name = str.split("-")[0]
-        name = name.replace("www.", "")
-        name = name.replace(".com", "")
-        name = name.split(".org")[0]
-        name = name.replace("https://", "")
-        return name
+        str = str.split("-")[0]
+        str = str.replace("www.", "")
+        str = str.replace(".com", "")
+        str = str.split(".org")[0]
+        str = str.replace("https://", "")
+        if (str.includes(":")) {
+            // It's a reddit feed
+            str = str.split(":")[1].replace(" ", "")
+            str = "r/"+str
+        }
+        console.log(str)
+        return str
     }
 
     function isValid(feed) {

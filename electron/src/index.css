@@ -34,7 +34,23 @@ h3 {
     justify-content: space-between;
     width: 1000px;
     height: 70px;
-    background-color: #404249
+    background-color: #404249;
+    font-family: 'Arvo', serif;
+    text-shadow: 2px 2px #323439;
+    /* font-weight: 100px; */
+}
+
+.meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    min-width: 330px;
+}
+
+.meta p {
+    color: #cccdce;
+    text-transform: uppercase;
+    font-size: 14px;
 }
 
 .rssItem:hover {
