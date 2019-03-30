@@ -61,8 +61,13 @@ func addItemToDB(result *Result, s *Stream) {
 	var rI Item
 	var img string
 	var date *time.Time
-	source := result.source
-	item := result.item
+
+	if result == nil {
+		log.Println("Error saving to database: result is nil")
+		return
+	}
+	source := result.Source
+	item := result.Item
 
 	db, err := gorm.Open("sqlite3", "rss.db")
 	if err != nil {
@@ -70,7 +75,7 @@ func addItemToDB(result *Result, s *Stream) {
 	}
 	defer db.Close()
 
-	// Some RSS feeds may not provide an image
+	// Some feeds may not provide an image
 	if item.Extensions == nil {
 		img = "None"
 	} else {
