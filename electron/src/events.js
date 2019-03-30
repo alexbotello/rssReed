@@ -84,6 +84,7 @@ $(function () {
         if (feed.includes("'")) return false
         if (feed.includes('"')) return false
         if (feed.length < 10) return false
+        return true
     }
 
     // Populate Feed sidebar and any feed items currenty in the database
