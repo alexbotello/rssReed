@@ -1,24 +1,14 @@
 $(function () {
+    const moment = require("moment")
+
     let container = document.getElementById("container")
     let feeds = document.getElementById("feeds")
     let plus = document.getElementById("plus")
     let label = document.getElementById("label")
     let button = document.getElementById("button")
     let input = document.getElementById("input")
+    let close = document.getElementById("popup-close")
     let items = $("#container");
-
-    // Helper functions
-    function formatDate(date) {
-        date = new Date(date)
-        var hours = date.getHours();
-        var minutes = date.getMinutes();
-        var ampm = hours >= 12 ? 'pm' : 'am';
-        hours = hours % 12;
-        hours = hours ? hours : 12; // the hour '0' should be '12'
-        minutes = minutes < 10 ? '0' + minutes : minutes;
-        var strTime = hours + ':' + minutes + ' ' + ampm;
-        return date.getMonth() + 1 + "/" + date.getDate() + "/" + date.getFullYear() + "  " + strTime;
-    };
 
     function sleep(ms) {
         var date = new Date();
@@ -35,7 +25,7 @@ $(function () {
             let link = $("<a>").attr("href", data[i].Link)
             let title = $("<h3>").text(data[i].Title)
             link.append(title)
-            let date = $("<span>").text(formatDate(data[i].Date))
+            let date = $("<span>").text(moment(data[i].Date).format("MMMM Do YYYY"))
             rssItem.append(link, date)
             rssItem.prependTo(items)
         }
@@ -62,6 +52,12 @@ $(function () {
         name = name.split(".org")[0]
         name = name.replace("https://", "")
         return name
+    }
+
+    function isValid(feed) {
+        if (feed.includes("'")) return false
+        if (feed.includes('"')) return false
+        if (feed.length < 10) return false
     }
 
     // Populate Feed sidebar and any feed items currenty in the database
@@ -106,8 +102,22 @@ $(function () {
         popup.classList.add("visible")
     })
 
+    // Remove error outline if refocusing on input
+    input.addEventListener("focus", (event) => {
+        input.style.outline="none"
+    })
+
+    // Close popup if X button is clicked
+    close.addEventListener('click', (event) => {
+        popup.classList.remove("visible")
+    })
+
     // Submit new rss feed to server
     button.addEventListener("click", (event) => {
+        if (!isValid(input.value)) {
+            input.style.outline="1px solid #8B0000"
+            return
+        }
         popup.classList.remove("visible")
         let data = {"Url": input.value}
         input.value = ""

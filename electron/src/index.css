@@ -131,6 +131,17 @@ h3 {
     font-size: 40px;
 }
 
+#popup-close {
+    color: #cccdce;
+    font-size: 25px;
+    align-self: flex-end;
+    padding-right: 20px;
+    padding-left: 20px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    cursor: pointer;
+}
+
 .input-wrapper {
     display: flex;
     flex-direction: column;
@@ -174,4 +185,8 @@ h3 {
 }
 .visible {
     visibility: visible ;
+}
+
+.error-outline {
+    outline: red !important;
 }
