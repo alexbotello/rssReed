@@ -12,6 +12,11 @@ func (t byResult) Swap(i, j int) {
 }
 
 func (t byResult) Less(i, j int) bool {
+	defer func() {
+		if err := recover(); err != nil {
+			return
+		}
+	}()
 	a, b := t[i].item, t[j].item
 	if a.PublishedParsed == nil || b.PublishedParsed == nil {
 		return false
