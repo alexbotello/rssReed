@@ -59,7 +59,6 @@ func addFeedToDB(f *Feed) error {
 
 func addItemToDB(result *Result, s *Stream) {
 	var rI Item
-	var img string
 	var date *time.Time
 
 	if result == nil {
@@ -75,13 +74,6 @@ func addItemToDB(result *Result, s *Stream) {
 	}
 	defer db.Close()
 
-	// Some feeds may not provide an image
-	if item.Extensions == nil {
-		img = "None"
-	} else {
-		img = item.Extensions["media"]["thumbnail"][0].Attrs["url"]
-	}
-
 	if item.PublishedParsed == nil {
 		date = item.UpdatedParsed
 	} else {
@@ -96,7 +88,6 @@ func addItemToDB(result *Result, s *Stream) {
 			Link:   item.Link,
 			Desc:   item.Description,
 			Date:   date,
-			Image:  img,
 		}
 		db.NewRecord(rI)
 		db.Create(&rI)

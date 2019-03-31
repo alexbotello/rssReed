@@ -48,7 +48,6 @@ type Item struct {
 	Link   string
 	Desc   string
 	Date   *time.Time
-	Image  string
 }
 
 func gatherFeeds(s *Stream) {
