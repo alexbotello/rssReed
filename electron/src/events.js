@@ -41,8 +41,8 @@ $(function () {
     function populateFeed(data) {
         for (let i = 0; i < data.length; i++) {
             let name = parseFeedName(data[i])
-            let li = $("<li>").text(name.toUpperCase()).addClass("Feed")
-            li.appendTo(feeds)
+            let p = $("<p>").text(name.toUpperCase()).addClass("Feed")
+            p.appendTo(feeds)
         }
     }
 

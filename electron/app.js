@@ -3,6 +3,7 @@ const {
   BrowserWindow,
   remote
 } = require('electron')
+const { execFile } = require('child_process')
 const WebSocket = require("ws")
 const shell = require('electron').shell;
 const axios = require("axios")
@@ -11,7 +12,13 @@ const path = require('path')
 
 let window = null
 
-
+// const server = execFile("./server", (err, stdout, stderr) => {
+//   if (err) {
+//     console.log(err)
+//     return
+//   }
+//   console.log(stdout)
+// })
 
 // Wait until the app is ready
 app.once('ready', () => {
@@ -30,15 +37,23 @@ app.once('ready', () => {
     }
   })
 
+  // setTimeout(() => {
+  //     window.socket = new WebSocket("ws://localhost:5000/stream")
+  //     window.socket.setMaxListeners(1)
+  //     window.loadURL(url.format({
+  //       pathname: path.join(__dirname, 'index.html'),
+  //       protocol: 'file:',
+  //       slashes: true
+  //     }))
+  // }, 1000)
   window.socket = new WebSocket("ws://localhost:5000/stream")
   window.socket.setMaxListeners(1)
-
-
   window.loadURL(url.format({
     pathname: path.join(__dirname, 'index.html'),
     protocol: 'file:',
     slashes: true
   }))
+
 
   window.once('ready-to-show', () => {
     window.show()
